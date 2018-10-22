@@ -1,16 +1,27 @@
 PImage[] lamp = new PImage[2];
 PImage[] personLeft = new PImage[4];
-PImage personStand;
+PImage personLight;
+PImage light;
 color day, night;
 
-int lampIndex = 0;
+PFont font;
+
+//int lampIndex = 0;
 int personIndex = 0;
-float xPosition = 0;
-float yPosition;
+float personPosX = 0;
+//float yPosition;
 boolean faceLeft = true;
+int lampCount = 5;
+float[] lampPosX = new float[lampCount];
+float lampInterval = 400;
+int currentPos;
+boolean lighting = false;
+boolean lighted = false;
 
 void setup() {
   fullScreen();
+  font = createFont("Futura", 28);
+  textFont(font);
 
   // draw background
   day = color(255);
@@ -21,25 +32,40 @@ void setup() {
   for (int i = 0; i < 4; i++) {
     personLeft[i] = loadImage("walk"+i+".png");
   }
+  personLight = loadImage("stand.png");
+
+  // draw lamp
+  lamp[0] = loadImage("lamp.png");
+  light = loadImage("light.png");
 
   frameRate(10);
 }
 
 void draw() {
   setGradient(0, 0, width, height, day, night);
-  if (faceLeft) {
-    image(personLeft[personIndex], width/2+xPosition, height/2);
-    //if(keyPressed){
-    //  personIndex = (personIndex + 1) % 4;
-    //}
+
+  for (int i = 0; i < lampCount; i++) {
+    lampPosX[i] = lampInterval * i;
+    image(lamp[0], lampPosX[i], height/2-60);
+    if (lighted) {
+      image(light, lampPosX[currentPos - 1], height/2-100);
+    }
   }
-  
-  if (xPosition > width/2){
-    xPosition = -width/2;
+
+  if (faceLeft && !lighting) {
+    image(personLeft[personIndex], width/2+personPosX, height/2);
   }
-  
-  if (xPosition < -width/2){
-    xPosition = width/2;
+
+  if (faceLeft && lighting) {
+    image(personLight, width/2+personPosX, height/2);
+  }
+
+  if (personPosX > width/2) {
+    personPosX = -width/2;
+  }
+
+  if (personPosX < -width/2) {
+    personPosX = width/2;
   }
 }
 
@@ -53,12 +79,32 @@ void setGradient(int x, int y, float w, float h, color c1, color c2) {
   }
 }
 
-void keyPressed(){
-  if(key == CODED){
-    if(keyCode == LEFT){
+void checkCurrent() {
+  for (int i = 0; i < lampCount; i++) {
+    if (abs(width/2 + personPosX - lampPosX[i]) < 30) {
+      currentPos = i + 1;
+      text("current position is " + i, 100, 30);
+    } else {
+      currentPos = 0;
+    }
+  }
+}
+
+void keyPressed() {
+  if (key == CODED) {
+    if (keyCode == LEFT) {
       faceLeft = true;
-      xPosition = xPosition - 30;
+      personPosX = personPosX - 30;
       personIndex = (personIndex + 1) % 4;
+    }
+  }
+
+  if (key == ' ') {
+    lighting = true;
+    checkCurrent();
+
+    if (currentPos > 0) {
+      lighted = true;
     }
   }
 }
