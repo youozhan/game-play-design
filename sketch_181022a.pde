@@ -10,6 +10,7 @@ int currentPos;
 float delta = 0;
 
 int gameScreen = 0;
+int idleCount = 100;
 
 void setup() {
   fullScreen();
@@ -42,9 +43,11 @@ void initScreen() {
   textSize(48);
   text("THE LAMPLIGHTER", width/2, height/2 - 80);
   textSize(24);
-  text("S to Start", width/2, height/2);
-  text("SPACE to Light", width/2, height/2 + 40);
-  text("A/D or left/right keys to Move", width/2, height/2 + 80);
+  text("When the night comes, you must light up all the lamps.", width/2, height/2);
+  text("S to Start", width/2, height/2 + 80);
+  text("SPACE to Light", width/2, height/2 + 120);
+  text("A/D or left/right keys to Move", width/2, height/2 + 160);
+
 }
 
 void gameScreen() {
@@ -62,6 +65,15 @@ void gameScreen() {
   }
 
   person.display();
+  
+  if (!keyPressed){
+    idleCount --;
+  }
+  
+  if (idleCount == 0){
+    person.idle = true;
+    idleCount = 100;
+  }
 }
 
 void setGradient(int x, int y, float w, float h, color c1, color c2) {
@@ -110,10 +122,6 @@ void checkCurrent() {
 void keyPressed() {
   person.idle = false;
 
-  if (key == 's' || key == 'S') {
-    gameScreen = 1;
-  }
-
   if (key == CODED) {
     if (keyCode == LEFT) {
       person.faceLeft = true;
@@ -143,6 +151,11 @@ void keyPressed() {
 
 void keyReleased() {
   person.idle = false;
+  
+  if (key == 's' || key == 'S') {
+    gameScreen = 1;
+    person.idle = true;
+  }
 
   if (key == ' ') {
     person.lighting = true;
