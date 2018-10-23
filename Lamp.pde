@@ -26,6 +26,7 @@ class Lamp {
   void update() {
     if (lighted) {
       image(lampLight, lightPosX, lightPosY);
+    } else {
     }
   }
 }

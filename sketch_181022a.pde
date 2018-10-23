@@ -9,8 +9,8 @@ PFont font;
 int currentPos;
 
 void setup() {
-  //fullScreen();
-  size(1280, 720);
+  fullScreen();
+  //size(1280, 720);
   font = createFont("Futura-Medium", 28);
   textFont(font);
 
@@ -19,13 +19,13 @@ void setup() {
   night = color(39, 32, 62);
   setGradient(0, 0, width, height, day, night);
 
-  person = new Person(0);
+  person = new Person();
 
   for (int i = 0; i < lamp.length; i++) {
     lamp[i] = new Lamp(lampInterval*i);
   }
 
-  frameRate(20);
+  //frameRate(20);
 }
 
 void draw() {
@@ -33,10 +33,7 @@ void draw() {
 
   for (int i = 0; i < lampCount; i++) {
     lamp[i].display();
-
-    if (lamp[i].lighted && currentPos != 0) {
-      lamp[i].update();
-    }
+    lamp[i].update();
   }
 
   person.display();
@@ -55,13 +52,13 @@ void setGradient(int x, int y, float w, float h, color c1, color c2) {
 void checkCurrent() {
   currentPos = 0;
   for (int i = 0; i < lampCount; i++) {
-    println(abs(person.personPosX - lamp[i].lampPosX));
+    println(person.personPosX - lamp[i].lampPosX);
 
-    if (abs(person.personPosX - lamp[i].lampPosX) < 100) {
+    if (abs(person.personPosX - 100 - lamp[i].lampPosX) < 70) {
       currentPos = i + 1;
       fill(0);
-      text("current position is " + currentPos, 60, 60);
-      /rintln("current position is " + currentPos);
+      //text("current position is " + currentPos, 60, 60);
+      println("current position is " + currentPos);
     }
   }
 }
@@ -73,16 +70,26 @@ void keyPressed() {
       person.update();
       person.lighting = false;
     }
+    
+    if (keyCode == RIGHT){
+      person.faceLeft = false;
+      person.update();
+      person.lighting = false;
+    }
   }
+}
 
+void keyReleased() {
   if (key == ' ') {
     person.lighting = true;
-
     checkCurrent();
 
     if (currentPos > 0) {
-      lamp[currentPos - 1].lighted = true;
-      println("current position is lighted");
+      if (lamp[currentPos - 1].lighted) {
+        lamp[currentPos - 1].lighted = false;
+      } else {
+        lamp[currentPos - 1].lighted = true;
+      }
     }
   }
 }
