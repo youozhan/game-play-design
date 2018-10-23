@@ -9,6 +9,8 @@ PFont font;
 int currentPos;
 float delta = 0;
 
+int gameScreen = 0;
+
 void setup() {
   fullScreen();
   //size(2880, 720);
@@ -27,13 +29,32 @@ void setup() {
 }
 
 void draw() {
+  if (gameScreen == 0) {
+    initScreen();
+  } else if (gameScreen == 1) {
+    gameScreen();
+  }
+}
+
+void initScreen() {
+  setGradient(0, 0, width, height, day, night);
+  textAlign(CENTER);
+  textSize(48);
+  text("THE LAMPLIGHTER", width/2, height/2 - 80);
+  textSize(24);
+  text("S to Start", width/2, height/2);
+  text("SPACE to Light", width/2, height/2 + 40);
+  text("A/D or left/right keys to Move", width/2, height/2 + 80);
+}
+
+void gameScreen() {
   background(255);
-  delta -= 200;
+  delta -= 30;
   moveCanvas();
   println(delta);
 
-  fill(0);
-  text("frameCount: " + frameCount, 60, 60);
+  //fill(0);
+  //text("frameCount: " + millis(), 60, 60);
 
   for (int i = 0; i < lampCount; i++) {
     lamp[i].display();
@@ -89,6 +110,10 @@ void checkCurrent() {
 void keyPressed() {
   person.idle = false;
 
+  if (key == 's' || key == 'S') {
+    gameScreen = 1;
+  }
+
   if (key == CODED) {
     if (keyCode == LEFT) {
       person.faceLeft = true;
@@ -101,6 +126,18 @@ void keyPressed() {
       person.update();
       person.lighting = false;
     }
+  }
+
+  if (key == 'a' || key == 'A') {
+    person.faceLeft = true;
+    person.update();
+    person.lighting = false;
+  }
+
+  if (key == 'd' || key == 'D') {
+    person.faceLeft = false;
+    person.update();
+    person.lighting = false;
   }
 }
 
