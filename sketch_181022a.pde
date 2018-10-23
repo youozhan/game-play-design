@@ -1,26 +1,17 @@
-PImage[] lamp = new PImage[2];
-PImage[] personLeft = new PImage[4];
-PImage personLight;
-PImage light;
 color day, night;
+Person person;
+int lampCount = 5;
+float lampInterval = 400;
+Lamp[] lamp = new Lamp[lampCount];
 
 PFont font;
 
-//int lampIndex = 0;
-int personIndex = 0;
-float personPosX = 0;
-//float yPosition;
-boolean faceLeft = true;
-int lampCount = 5;
-float[] lampPosX = new float[lampCount];
-float lampInterval = 400;
 int currentPos;
-boolean lighting = false;
-boolean lighted = false;
 
 void setup() {
-  fullScreen();
-  font = createFont("Futura", 28);
+  //fullScreen();
+  size(1280, 720);
+  font = createFont("Futura-Medium", 28);
   textFont(font);
 
   // draw background
@@ -28,51 +19,33 @@ void setup() {
   night = color(39, 32, 62);
   setGradient(0, 0, width, height, day, night);
 
-  // draw person
-  for (int i = 0; i < 4; i++) {
-    personLeft[i] = loadImage("walk"+i+".png");
+  person = new Person(0);
+
+  for (int i = 0; i < lamp.length; i++) {
+    lamp[i] = new Lamp(lampInterval*i);
   }
-  personLight = loadImage("stand.png");
 
-  // draw lamp
-  lamp[0] = loadImage("lamp.png");
-  light = loadImage("light.png");
-
-  frameRate(10);
+  frameRate(20);
 }
 
 void draw() {
   setGradient(0, 0, width, height, day, night);
 
   for (int i = 0; i < lampCount; i++) {
-    lampPosX[i] = lampInterval * i;
-    image(lamp[0], lampPosX[i], height/2-60);
-    if (lighted) {
-      image(light, lampPosX[currentPos - 1], height/2-100);
+    lamp[i].display();
+
+    if (lamp[i].lighted && currentPos != 0) {
+      lamp[i].update();
     }
   }
 
-  if (faceLeft && !lighting) {
-    image(personLeft[personIndex], width/2+personPosX, height/2);
-  }
-
-  if (faceLeft && lighting) {
-    image(personLight, width/2+personPosX, height/2);
-  }
-
-  if (personPosX > width/2) {
-    personPosX = -width/2;
-  }
-
-  if (personPosX < -width/2) {
-    personPosX = width/2;
-  }
+  person.display();
 }
 
 void setGradient(int x, int y, float w, float h, color c1, color c2) {
   noFill();
   for (int i=x; i<=x+w; i++) {
-    float inter = map(i, x, x+w, 0, 1);
+    float inter = map(i, x, x+w, 0, 1); 
     color c = lerpColor(c1, c2, inter);
     stroke(c);
     line(i, y, i, y+h);
@@ -80,12 +53,15 @@ void setGradient(int x, int y, float w, float h, color c1, color c2) {
 }
 
 void checkCurrent() {
+  currentPos = 0;
   for (int i = 0; i < lampCount; i++) {
-    if (abs(width/2 + personPosX - lampPosX[i]) < 30) {
+    println(abs(person.personPosX - lamp[i].lampPosX));
+
+    if (abs(person.personPosX - lamp[i].lampPosX) < 100) {
       currentPos = i + 1;
-      text("current position is " + i, 100, 30);
-    } else {
-      currentPos = 0;
+      fill(0);
+      text("current position is " + currentPos, 60, 60);
+      /rintln("current position is " + currentPos);
     }
   }
 }
@@ -93,18 +69,20 @@ void checkCurrent() {
 void keyPressed() {
   if (key == CODED) {
     if (keyCode == LEFT) {
-      faceLeft = true;
-      personPosX = personPosX - 30;
-      personIndex = (personIndex + 1) % 4;
+      person.faceLeft = true;
+      person.update();
+      person.lighting = false;
     }
   }
 
   if (key == ' ') {
-    lighting = true;
+    person.lighting = true;
+
     checkCurrent();
 
     if (currentPos > 0) {
-      lighted = true;
+      lamp[currentPos - 1].lighted = true;
+      println("current position is lighted");
     }
   }
 }
