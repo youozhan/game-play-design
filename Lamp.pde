@@ -1,7 +1,6 @@
 class Lamp {
   PImage lampImage;
   PImage lampLight;
-  //int lampCount;
   float lampPosX;
   float lampPosY;
   float lightPosX;
@@ -11,7 +10,6 @@ class Lamp {
   Lamp(float lampPosX_) {
     lampImage = loadImage("lamp.png");
     lampLight = loadImage("light.png");
-    //lampCount = lampCount_;
     lampPosX = lampPosX_;
     lampPosY = height/2 - 60;
     lightPosX = lampPosX - 130;

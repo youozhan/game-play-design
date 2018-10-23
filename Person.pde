@@ -1,7 +1,8 @@
 class Person {
   PImage[] personLeft;
   PImage[] personRight;
-  PImage personLight;
+  PImage personLightLeft;
+  PImage personLightRight;
   PImage personIdle;
   int personIndex;
   float personPosX;
@@ -20,29 +21,38 @@ class Person {
       personRight[i] = loadImage("fwalk"+i+".png");
     }
 
-    personLight = loadImage("stand.png");
+    personLightLeft = loadImage("stand.png");
+    personLightRight = loadImage("fstand.png");
     personIdle = loadImage("idle.png");
     personIndex = 0;
     personPosX = width/2;
     personPosY = height/2;
-    standPosX = personPosX - 45;
+    standPosX = personPosX;
     standPosY = personPosY;
     faceLeft = true;
     lighting = false;
-    idle = false;
+    idle = true;
   }
 
   void display() {
-    if (!lighting) {
-      if (faceLeft) {
-        image(personLeft[personIndex], personPosX, personPosY);
-      } else {
-        image(personRight[personIndex], personPosX, personPosY);
+    if (!idle) {
+      if (!lighting) {
+        if (faceLeft) {
+          image(personLeft[personIndex], personPosX, personPosY);
+        } else {
+          image(personRight[personIndex], personPosX, personPosY);
+        }
       }
-    }
 
-    if (lighting) {
-      image(personLight, standPosX, standPosY);
+      if (lighting) {
+        if (faceLeft) {
+          image(personLightLeft, standPosX, standPosY);
+        } else {
+          image(personLightRight, standPosX, standPosY);
+        }
+      }
+    } else {
+      image(personIdle, standPosX, standPosY);
     }
 
     if (personPosX > width) {
@@ -55,12 +65,13 @@ class Person {
   }
 
   void update() {
-    if (faceLeft){
+    if (faceLeft) {
       personPosX = personPosX - 30;
+      standPosX = personPosX - 45;
     } else {
       personPosX = personPosX + 30;
+      standPosX = personPosX + 25;
     }
-    standPosX = personPosX - 45;
     personIndex = (personIndex + 1) % 4;
   }
 }
