@@ -1,3 +1,14 @@
+import ddf.minim.*;
+import ddf.minim.analysis.*;
+import ddf.minim.effects.*;
+import ddf.minim.signals.*;
+import ddf.minim.spi.*;
+import ddf.minim.ugens.*;
+
+Minim minim;
+AudioPlayer ons, offs, back;
+
+
 color day, night;
 Person person;
 int lampCount = 5;
@@ -17,7 +28,12 @@ void setup() {
   //size(2880, 720);
   font = createFont("Futura-Medium", 28);
   textFont(font);
-
+  minim = new Minim(this);
+  ons = minim.loadFile("on.mp3", 1024);
+  //ons = minim.loadFile("Ting.mp3", 1024);
+  offs = minim.loadFile("off.mp3", 1024);
+  //back = minim.loadFile("cosmos.mp3", 1024);
+    //back.loop();
   // draw background
   day = color(255);
   night = color(39, 32, 62);
@@ -27,6 +43,7 @@ void setup() {
   for (int i = 0; i < lamp.length; i++) {
     lamp[i] = new Lamp(lampInterval*i+20);
   }
+
 }
 
 void draw() {
@@ -47,30 +64,32 @@ void initScreen() {
   text("S to Start", width/2, height/2 + 80);
   text("SPACE to Light", width/2, height/2 + 120);
   text("A/D or left/right keys to Move", width/2, height/2 + 160);
-
 }
 
 void gameScreen() {
   background(255);
   delta -= 30;
   moveCanvas();
-  println(delta);
+  //println(delta);
 
   //fill(0);
   //text("frameCount: " + millis(), 60, 60);
-
+  stroke(200,200,200,50);
+  strokeWeight(3);
+  fill(200,200,200,50);
+  rect(0, 700, width, 400);
   for (int i = 0; i < lampCount; i++) {
     lamp[i].display();
     lamp[i].update();
   }
 
   person.display();
-  
-  if (!keyPressed){
+
+  if (!keyPressed) {
     idleCount --;
   }
-  
-  if (idleCount == 0){
+
+  if (idleCount == 0) {
     person.idle = true;
     idleCount = 100;
   }
@@ -105,12 +124,12 @@ void checkCurrent() {
   for (int i = 0; i < lampCount; i++) {
     println(person.personPosX - lamp[i].lampPosX);
     if (person.faceLeft) {
-      if (abs(person.personPosX - 100 - lamp[i].lampPosX) < 70) {
+      if (abs(person.personPosX - 100 - lamp[i].lampPosX) < 100) {
         currentPos = i + 1;
         println("current position is " + currentPos);
       }
     } else {
-      if (abs(person.personPosX + 60 - lamp[i].lampPosX) < 90) {
+      if (abs(person.personPosX + 60 - lamp[i].lampPosX) < 110) {
         currentPos = i + 1;
         fill(0);
         println("current position is " + currentPos);
@@ -123,10 +142,13 @@ void keyPressed() {
   person.idle = false;
 
   if (key == CODED) {
+         //offs.pause();
+         //ons.pause();
     if (keyCode == LEFT) {
       person.faceLeft = true;
       person.update();
       person.lighting = false;
+ 
     }
 
     if (keyCode == RIGHT) {
@@ -151,7 +173,7 @@ void keyPressed() {
 
 void keyReleased() {
   person.idle = false;
-  
+
   if (key == 's' || key == 'S') {
     gameScreen = 1;
     person.idle = true;
@@ -164,8 +186,12 @@ void keyReleased() {
     if (currentPos > 0) {
       if (lamp[currentPos - 1].lighted) {
         lamp[currentPos - 1].lighted = false;
+        offs.rewind();
+        offs.play();
       } else {
         lamp[currentPos - 1].lighted = true;
+         ons.rewind();
+        ons.play();
       }
     }
   }
